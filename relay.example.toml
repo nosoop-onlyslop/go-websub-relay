@@ -1,0 +1,47 @@
+# Example websub-relayd configuration.
+#
+# This file is format-compatible with the canonical Python websub-relay daemon;
+# the same relay.toml works with either implementation.
+#
+# The relay must be reachable by the WebSub hub at `public_url`.
+# Terminate TLS in front of it (Caddy/nginx) or run it behind a proxy that does.
+
+# Public base URL of the relay (used to build hub callback URLs).
+public_url = "https://relay.example.net"
+
+# Address the HTTP server binds to.  Keep this off the public internet and
+# put a reverse proxy in front of it.  Either a TCP host:port ...
+listen = "127.0.0.1:8080"
+# ... or a Unix domain socket, which is handy when the proxy runs on the same host.
+# The socket file is created with the process umask; make sure the proxy user can
+# write to it.  A stale socket from a previous run is removed on startup.
+# listen = "unix:/run/websub-relay.sock"
+
+# SQLite database holding subscriptions and undelivered notifications.
+db_path = "relay.db3"
+
+# Hub used for topics that do not advertise <link rel="hub">.
+default_hub = "https://pubsubhubbub.appspot.com/"
+
+# Lease requested from the hub, and how early to renew it.
+lease_seconds = 432000
+renew_margin = "PT12H"
+
+# How long undelivered notifications are retained; older acked ones are pruned.
+retention = "P7D"
+
+request_timeout = 20.0
+manager_interval = "PT5M"
+heartbeat = 30.0
+
+# Each client instance is a tenant.
+[[tenants]]
+id = "home"
+token = "replace-with-a-long-random-secret"
+# Optional per-tenant HMAC key so clients can verify relay-to-client deliveries.
+# delivery_key = "replace-with-another-random-secret"
+# watch_limit = 500
+
+# [[tenants]]
+# id = "secondary"
+# token = "another-long-random-secret"

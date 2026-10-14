@@ -1,0 +1,13 @@
+# Binaries
+/websub-relayd
+/websub-relayd.exe
+/dist/
+
+# SQLite databases and WAL sidecars
+*.db3
+*.db3-shm
+*.db3-wal
+relay.db3*
+
+# Unix sockets
+*.sock

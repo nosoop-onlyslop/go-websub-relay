@@ -116,8 +116,12 @@ uv run --with aiohttp --with websockets \
     --relay-src /path/to/websub-relay/src
 ```
 
-### Reading a Python-produced database
+### Reading a Python-produced database or config
+
+The store and config packages can be pointed at files produced by the canonical
+Python daemon:
 
 ```sh
 RELAY_PYTHON_DB=/path/to/relay.db3 go test ./store/ -run TestOpenPythonDatabase -v
+RELAY_PYTHON_CONFIG=/path/to/relay.toml go test ./config/ -run TestLoadPythonConfig -v
 ```

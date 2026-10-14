@@ -1,6 +1,7 @@
 package config
 
 import (
+	"os"
 	"testing"
 	"time"
 )
@@ -125,5 +126,33 @@ func TestParseRejectsUnknownFields(t *testing.T) {
 func TestParseRequiresPublicURL(t *testing.T) {
 	if _, err := Parse([]byte("listen = \"127.0.0.1:8080\"\n")); err == nil {
 		t.Fatal("expected missing public_url error")
+	}
+}
+
+// TestLoadPythonConfig loads a relay.toml written for the canonical Python
+// daemon.  Set RELAY_PYTHON_CONFIG to such a file to enable it.  This exercises
+// the full Python config surface, including ISO 8601 durations and a Unix
+// socket listen address.
+func TestLoadPythonConfig(t *testing.T) {
+	path := os.Getenv("RELAY_PYTHON_CONFIG")
+	if path == "" {
+		t.Skip("RELAY_PYTHON_CONFIG not set")
+	}
+	config, err := Load(path)
+	if err != nil {
+		t.Fatalf("Load(%q): %v", path, err)
+	}
+	if config.PublicURL == "" {
+		t.Fatal("expected public_url")
+	}
+	if _, err := ParseListen(config.Listen); err != nil {
+		t.Fatalf("listen %q: %v", config.Listen, err)
+	}
+	if config.RenewMargin.Duration() <= 0 || config.Retention.Duration() <= 0 ||
+		config.ManagerInterval.Duration() <= 0 {
+		t.Fatalf("expected positive durations: %+v", config)
+	}
+	if len(config.Tenants) == 0 {
+		t.Fatal("expected at least one tenant")
 	}
 }

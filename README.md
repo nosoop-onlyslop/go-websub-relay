@@ -63,6 +63,18 @@ cp relay.example.toml relay.toml
 ./websub-relayd --config relay.toml
 ```
 
+A [`just`](https://github.com/casey/just) Justfile wraps the common tasks:
+
+```sh
+just build        # native binary
+just test         # go test ./...
+just cross        # static linux/amd64 and linux/arm64 binaries in dist/
+just cross-linux arm64
+```
+
+The SQLite driver is pure Go, so the cross-compiled Linux binaries are
+statically linked and need no C toolchain.
+
 The relay only needs to be reachable at `public_url` by the hub.  Keep
 `listen` on loopback and terminate TLS with a reverse proxy.
 
@@ -109,8 +121,14 @@ clients interoperate with the Go daemon.  It requires the canonical
 `websub-relay` source tree (for `websub_relay.protocol`):
 
 ```sh
+RELAY_SRC=/path/to/websub-relay/src just interop
+```
+
+Equivalently, without `just`:
+
+```sh
 go build -o /tmp/websub-relayd ./cmd/websub-relayd
-uv run --with aiohttp --with websockets \
+uv run --with aiohttp --with websockets --with msgspec \
     interop/interop.py \
     --go-binary /tmp/websub-relayd \
     --relay-src /path/to/websub-relay/src

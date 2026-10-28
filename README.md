@@ -1,3 +1,9 @@
+> [!NOTE]
+>
+> Human foreword:
+>
+> Deploying Python daemons (combination systemd `.service` unit and `uv`) is a pain.
+
 # go-websub-relay
 
 A Go port of the canonical Python `websub-relay` project.  It covers both the
